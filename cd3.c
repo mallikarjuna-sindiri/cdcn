@@ -224,7 +224,7 @@ int main()
 
 
 //output
-// Enter number of productions: 3
+// Enter number of productions: 3E
 // Enter production 1 (format: A=xyz): E=TR
 // Enter production 2 (format: A=xyz): R=eTR|#
 // Enter production 3 (format: A=xyz): T=i
