@@ -1,105 +1,112 @@
-//Write a c-program to implement lexical analyser
-//gcc cd1.c -o cd1 
-//./cd1
-#include <ctype.h>
-#include <stdbool.h>
+// lexical analyzeer code with c program as input
+
 #include <stdio.h>
+#include <ctype.h>
 #include <string.h>
-//Function to check if a character is a delimiter
-bool isDelimiter(char ch) {
-return (ch == ' ' || ch == '+' || ch == '-' || ch == '*' ||
-ch == '/' || ch == ',' || ch == ';' || ch == '>' ||
-ch == '<' || ch == '=' || ch == '(' || ch == ')' ||
-ch == '[' || ch == ']' || ch == '{' || ch == '}' ||
-ch == '\n' || ch == '\t');
+
+void fn(char c[]) {
+    int i, pos = 0;
+    char lex[100];
+
+    while (c[pos]) {
+        char ch = c[pos];
+
+        if (isspace(ch)) {
+            pos++;
+            continue;
+        }
+
+        i = 0;
+
+        // Identifiers
+        if (isalpha(ch)) {
+            while (isalnum(c[pos])) {
+                lex[i++] = c[pos++];
+            }
+            lex[i] = '\0';
+            printf("IDENTIFIER: %s\n", lex);
+        }
+
+        // Numbers
+        else if (isdigit(ch)) {
+            while (isdigit(c[pos])) {
+                lex[i++] = c[pos++];
+            }
+            lex[i] = '\0';
+            printf("NUMBER: %s\n", lex);
+        }
+
+        // Operators
+        else {
+            if (ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '%' ||
+                ch == '=' || ch == '<' || ch == '>' || ch == '!') {
+                printf("OPERATOR: %c\n", ch);
+            }
+
+            // Punctuation
+            else if (ch == '(' || ch == ')' || ch == '{' || ch == '}' ||
+                     ch == ';' || ch == ',') {
+                printf("PUNCTUATION: %c\n", ch);
+            }
+
+            // Unknown
+            else {
+                printf("UNKNOWN: %c\n", ch);
+            }
+
+            pos++;
+        }
+    }
 }
-// Function to check if a character is an operator
-bool isOperator(char ch) {
-return (ch == '+' || ch == '-' || ch == '*' || ch == '/' ||
-ch == '>' || ch == '<' || ch == '=');
-}
-// Function to check if a string is a keyword
-bool isKeyword(char* str) 
-{
-char keywords[32][10] = {"auto", "break", "case", "char", "const", "continue", 
-"default", "do", "double", "else", "enum", "extern",
-"float", "for", "goto", "if", "int", "long", "register",
-"return", "short", "signed", "sizeof", "static", "struct",
-"switch", "typedef", "union", "unsigned", "void", "volatile",
-"while"};
-int i;
-for (i = 0; i < 32; ++i) {
-if (strcmp(keywords[i], str) == 0) {
-return true;
-}
-}
-return false;
-}
-// Function to check if a string is a valid identifier
-bool isValidIdentifier(char* str) 
-{
-if (str == NULL || !isalpha(str[0])) 
-{
-return false;
-}
-int i;
-for (i = 1; i < strlen(str); i++) {
-if (!isalnum(str[i])) {
-return false;
-}
-}
-return true;
-}
-// Function to perform lexical analysis
-void lexicalAnalyzer(char* str) 
-{
-int left = 0, right = 0;
-int len = strlen(str);
-char subStr[100];
-while (right <= len && left <= right) {
-if (isDelimiter(str[right]) == false) {
-right++;
-}
-if (isDelimiter(str[right]) == true && left == right) {
-if (isOperator(str[right]) == true) 
-{
-printf("Operator: %c\n", str[right]);
-} 
-else if (str[right] != ' ' && str[right] != '\n' && str[right] != '\t') 
-{
-printf("Delimiter: %c\n", str[right]);
-}
-right++;
-left = right;
-} 
-else if (isDelimiter(str[right]) == true && left != right || (right == len && left != right))
-{
-strncpy(subStr, str + left, right - left);
-subStr[right - left] = '\0';
-if (isKeyword(subStr) == true) 
-{
-printf("Keyword: %s\n", subStr);
-} 
-else if (isValidIdentifier(subStr) == true) 
-{
-printf("Identifier: %s\n", subStr);
-} 
-else if (isdigit(subStr[0]) && isValidIdentifier(subStr) == false) 
-{
-printf("Literal (Numeric): %s\n", subStr);
-} 
-else {
-printf("Invalid Token: %s\n", subStr);
-}
-left = right;
-}
-}
-}
+
 int main() {
-char input_string[1000];
-printf("Enter the C code to analyze:\n");
-fgets(input_string, sizeof(input_string), stdin);
-printf("\nTokens found:\n");
-lexicalAnalyzer(input_string);
-return 0;
+    char exp[200];
+
+    printf("Enter C code snippet (empty line to finish):\n");
+
+    while (fgets(exp, sizeof(exp), stdin)) {
+        if (strcmp(exp, "\n") == 0)
+            break;
+        fn(exp);
+    }
+
+    return 0;
 }
+
+// OUTPUT:
+
+// input of c program:
+
+// int main()
+// {
+//     int total = count * rate;
+//     if (total > 100)
+//     {
+//         return total;
+//     }
+// }
+
+// IDENTIFIER: int
+// IDENTIFIER: main
+// PUNCTUATION: (
+// PUNCTUATION: )
+// PUNCTUATION: {
+// IDENTIFIER: int
+// IDENTIFIER: total
+// OPERATOR: =
+// IDENTIFIER: count
+// OPERATOR: *
+// IDENTIFIER: rate
+// PUNCTUATION: ;
+// IDENTIFIER: if
+// PUNCTUATION: (
+// IDENTIFIER: total
+// OPERATOR: >
+// NUMBER: 100
+// PUNCTUATION: )
+// PUNCTUATION: {
+// IDENTIFIER: return
+// IDENTIFIER: total
+// PUNCTUATION: ;
+// PUNCTUATION: }
+// PUNCTUATION: }
